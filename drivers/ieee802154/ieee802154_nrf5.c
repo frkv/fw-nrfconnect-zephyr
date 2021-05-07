@@ -41,7 +41,11 @@ LOG_MODULE_REGISTER(LOG_MODULE_NAME);
 
 #if defined(CONFIG_SOC_NRF5340_CPUAPP) && \
 	defined(CONFIG_TRUSTED_EXECUTION_NONSECURE)
+#if defined(CONFIG_SPM)
 #include <secure_services.h>
+#elif defined(CONFIG_BUILD_WITH_TFM)
+#include <tfm/tfm_ioctl_api.h>
+#endif
 #endif
 
 #include "ieee802154_nrf5.h"
@@ -125,6 +129,16 @@ static void nrf5_get_eui64(uint8_t *mac)
 	ret = spm_request_read(&factoryAddress,
 			       (uint32_t)&EUI64_ADDR[EUI64_ADDR_HIGH],
 			       sizeof(factoryAddress));
+#elif defined(CONFIG_BUILD_WITH_TFM)
+	enum tfm_platform_err_t tfmError;
+	uint32_t tfmServiceError;
+
+	tfmError = tfm_platform_mem_read(&factoryAddress, (uint32_t)&EUI64_ADDR[EUI64_ADDR_HIGH],
+					 sizeof(factoryAddress), &tfmServiceError);
+
+	if (tfmError == TFM_PLATFORM_ERR_SUCCESS && tfmServiceError == 0) {
+		ret = 0;
+	}
 #endif
 	if (ret != 0) {
 		LOG_ERR("Unable to read EUI64 from the secure zone.");
