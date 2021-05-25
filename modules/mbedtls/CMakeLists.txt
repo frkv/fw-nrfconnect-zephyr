@@ -33,8 +33,7 @@ if(CONFIG_ARCH_POSIX AND CONFIG_ASAN AND NOT CONFIG_64BIT)
 endif ()
 
   zephyr_library_link_libraries(mbedTLS)
-else()
-  assert(CONFIG_MBEDTLS_LIBRARY "MBEDTLS was enabled, but neither BUILTIN or LIBRARY was selected.")
+elseif (CONFIG_MBEDTLS_LIBRARY)
 
   # NB: CONFIG_MBEDTLS_LIBRARY is not regression tested and is
   # therefore susceptible to bit rot
@@ -51,6 +50,9 @@ else()
   # Lib mbedtls_external depends on libgcc (I assume?) so to allow
   # mbedtls_external to link with gcc we need to ensure it is placed
   # after mbedtls_external on the linkers command line.
+else()
+  # You are on your own with regards to include folders and library for
+  # mbed TLS.
 endif()
 
 endif()
