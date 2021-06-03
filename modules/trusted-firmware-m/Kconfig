@@ -152,6 +152,7 @@ config TFM_ISOLATION_LEVEL
 config TFM_BL2
 	bool "Add MCUboot to TFM"
 	default y
+	depends on !NORDIC_SECURITY_BACKEND
 	help
 	  TFM is designed to run with MCUboot in a certain configuration.
 	  This config adds MCUboot to the build - built via TFM's build system.
